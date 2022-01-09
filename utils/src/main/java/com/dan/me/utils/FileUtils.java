@@ -12,6 +12,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,7 +34,7 @@ public class FileUtils {
      * @return 被读的文件内容或null（若文件不存在）
      */
     @Nullable
-    public static String read(@NonNull String filePath) {
+    public static String fileRead(@NonNull String filePath) {
         File file = new File(filePath);
         if (!file.exists()) {
             return null;
@@ -60,14 +63,7 @@ public class FileUtils {
         return null;
     }
 
-    /**
-     * 写内容到本地文件
-     *
-     * @param filePath 文件路径
-     * @param content  待写内容
-     * @return 是否成功
-     */
-    public static boolean write(@NonNull String filePath, @NonNull String content) {
+    private static void mkdirs4parent(@NonNull String filePath) {
         File parentFile = new File(filePath).getParentFile();
         if (parentFile != null && !parentFile.exists()) {
             boolean suc = parentFile.mkdirs();
@@ -75,6 +71,17 @@ public class FileUtils {
                 throw new IllegalArgumentException("fail to mkdirs for parentFile: " + parentFile.getAbsolutePath());
             }
         }
+    }
+
+    /**
+     * 写内容到本地文件
+     *
+     * @param filePath 文件路径
+     * @param content  待写内容
+     * @return 是否成功
+     */
+    public static boolean fileWrite(@NonNull String filePath, @NonNull String content) {
+        mkdirs4parent(filePath);
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(filePath, false);
@@ -173,7 +180,15 @@ public class FileUtils {
         if (!srcFile.exists()) {
             return false;
         }
-        return srcFile.renameTo(new File(destFilePath));
+        File destFile = new File(destFilePath);
+        File destParentFile = destFile.getParentFile();
+        if (destParentFile != null && !destParentFile.exists()) {
+            boolean suc = destParentFile.mkdirs();
+            if (!suc) {
+                throw new IllegalArgumentException("fail to mkdirs for destParentFile: " + destParentFile.getAbsolutePath());
+            }
+        }
+        return srcFile.renameTo(destFile);
     }
 
     /**
@@ -218,7 +233,7 @@ public class FileUtils {
                 for (File file : files) {
                     final boolean suc;
                     if (file.isDirectory()) {
-                        suc = _deleteFilesAtDir(dirFile, deleteDir, fileFilter);
+                        suc = _deleteFilesAtDir(file, true, fileFilter);
                         if (!fail && !suc) {
                             fail = true;
                         }
@@ -231,7 +246,7 @@ public class FileUtils {
                 }
             }
 
-            if (deleteDir) {
+            if (deleteDir && Objects.requireNonNull(dirFile.listFiles()).length == 0/*只有文件夹下无文件时，才删除文件夹本身*/) {
                 boolean suc = dirFile.delete();
                 if (!fail && !suc) {
                     fail = true;
@@ -288,6 +303,45 @@ public class FileUtils {
         }
     }
 
+    private static List<File> _fileList(@NonNull File dirFile) {
+        List<File> fileList = new ArrayList<>();
+        for (File file : Objects.requireNonNull(dirFile.listFiles())) {
+            if (file.isFile()) {
+                fileList.add(file);
+            } else if (file.isDirectory()) {
+                fileList.addAll(_fileList(file));
+            } else {
+                throw new IllegalArgumentException("dirFile: " + dirFile.getAbsolutePath() + " is invalid");
+            }
+        }
+        return fileList;
+    }
+
+    /**
+     * 列出文件路径下的全部文件（不包含文件夹)
+     *
+     * @param filePath 文件路径
+     * @return 文件路径下的全部文件（不包含文件夹)
+     * @throws IllegalArgumentException 参数异常
+     */
+    @NonNull
+    public static List<File> fileList(@NonNull String filePath) {
+        List<File> fileList = new ArrayList<>();
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return fileList;
+        } else {
+            if (file.isFile()) {
+                fileList.add(file);
+                return fileList;
+            } else if (file.isDirectory()) {
+                return _fileList(file);
+            } else {
+                throw new IllegalArgumentException("filePath: " + filePath + " is invalid");
+            }
+        }
+    }
+
     /**
      * 文件添加内容，若文件不存在，则创建之，若已存在，则在其后继续写
      *
@@ -296,6 +350,7 @@ public class FileUtils {
      * @return 是否成功
      */
     public static boolean fileAppend(@NonNull String filePath, @NonNull String content) {
+        mkdirs4parent(filePath);
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(filePath, true);
@@ -317,13 +372,13 @@ public class FileUtils {
     }
 
     /**
-     * 计算文件md5sum
+     * 计算文件MD5
      *
      * @param filePath 文件路径
-     * @return 文件md5sum或null
+     * @return 文件MD5或null
      */
     @Nullable
-    public static String md5sum(@NonNull String filePath) {
+    public static String fileMD5(@NonNull String filePath) {
         try (FileInputStream fis = new FileInputStream(filePath)) {
             byte[] buffer = new byte[MD5SUM_BUFFER_SIZE];
             MessageDigest md5 = MessageDigest.getInstance("MD5");
