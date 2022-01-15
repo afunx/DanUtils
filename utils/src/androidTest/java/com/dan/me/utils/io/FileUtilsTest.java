@@ -2,7 +2,7 @@
  * Copyright (c) 2022 afunx. All Rights Reserved
  */
 
-package com.dan.me.utils;
+package com.dan.me.utils.io;
 
 import android.Manifest;
 import android.content.Context;

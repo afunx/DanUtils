@@ -2,7 +2,7 @@
  * Copyright (c) 2022 afunx. All Rights Reserved
  */
 
-package com.dan.me.utils;
+package com.dan.me.utils.bytes;
 
 public class BytesUtils {
 
