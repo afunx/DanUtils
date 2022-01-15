@@ -5,12 +5,10 @@
 package com.dan.me.utils.io;
 
 import android.Manifest;
-import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
@@ -38,26 +35,19 @@ public class FileUtilsTest {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-    private Context appContext;
-
-    private static final String sBasePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test";
+    private static final String sBasePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test/file";
 
     @BeforeClass
     public static void start() {
         Log.i(TAG, "start() sBasePath: " + sBasePath);
         // 测试开始前，先删除全部文件
-         FileUtils.dirDelete(sBasePath, true);
+        FileUtils.dirDelete(sBasePath, true);
     }
 
     @AfterClass
     public static void stop() {
         // 测试结束后，再删除全部文件
-        //FileUtils.dirDelete(sBasePath, true);
-    }
-
-    @Before
-    public void before() {
-        appContext = ApplicationProvider.getApplicationContext();
+        FileUtils.dirDelete(sBasePath, true);
     }
 
     @Test
