@@ -39,6 +39,8 @@ public class LogUtils {
 
     private static final GeneralLogger sLogGeneralHandler = new GeneralLogger();
 
+    private static final SpecializedLogger sSpecializedLogger = new SpecializedLogger();
+
     private LogUtils(boolean systemLogEnabled, boolean generalSaveEnabled, boolean specializedSaveEnabled) {
         mSystemLogEnabled = systemLogEnabled;
         mGeneralSaveEnabled = generalSaveEnabled;
@@ -59,6 +61,9 @@ public class LogUtils {
         sLogGeneralHandler.setPackageName(appContext.getPackageName());
         sLogGeneralHandler.setFolder(logUtilsOptions.getBasePath());
         sLogGeneralHandler.setMaxFileSize(logUtilsOptions.getGeneralFileMaxSize());
+        sSpecializedLogger.setPackageName(appContext.getPackageName());
+        sSpecializedLogger.setFolder(logUtilsOptions.getBasePath());
+        sSpecializedLogger.setMaxFileSize(logUtilsOptions.getSpecializedFileMaxSize());
     }
 
     // 虽然，这个实现会在最前面多一些内容。但是，考虑到多线程情况，这个是目前想到最好的实现。
@@ -130,6 +135,9 @@ public class LogUtils {
             if (mGeneralSaveEnabled) {
                 sLogGeneralHandler.log(LEVEL_V, tag, msg);
             }
+            if (mSpecializedSaveEnabled) {
+                sSpecializedLogger.log(LEVEL_V, tag, msg);
+            }
         }
     }
 
@@ -146,6 +154,9 @@ public class LogUtils {
             }
             if (mGeneralSaveEnabled) {
                 sLogGeneralHandler.log(LEVEL_D, tag, msg);
+            }
+            if (mSpecializedSaveEnabled) {
+                sSpecializedLogger.log(LEVEL_D, tag, msg);
             }
         }
     }
@@ -164,6 +175,9 @@ public class LogUtils {
             if (mGeneralSaveEnabled) {
                 sLogGeneralHandler.log(LEVEL_I, tag, msg);
             }
+            if (mSpecializedSaveEnabled) {
+                sSpecializedLogger.log(LEVEL_I, tag, msg);
+            }
         }
     }
 
@@ -180,6 +194,9 @@ public class LogUtils {
             }
             if (mGeneralSaveEnabled) {
                 sLogGeneralHandler.log(LEVEL_W, tag, msg);
+            }
+            if (mSpecializedSaveEnabled) {
+                sSpecializedLogger.log(LEVEL_W, tag, msg);
             }
         }
     }
@@ -198,6 +215,9 @@ public class LogUtils {
             if (mGeneralSaveEnabled) {
                 sLogGeneralHandler.log(LEVEL_E, tag, msg);
             }
+            if (mSpecializedSaveEnabled) {
+                sSpecializedLogger.log(LEVEL_E, tag, msg);
+            }
         }
     }
 
@@ -214,6 +234,9 @@ public class LogUtils {
             }
             if (mGeneralSaveEnabled) {
                 sLogGeneralHandler.log(LEVEL_WTF, tag, msg);
+            }
+            if (mSpecializedSaveEnabled) {
+                sSpecializedLogger.log(LEVEL_WTF, tag, msg);
             }
         }
     }

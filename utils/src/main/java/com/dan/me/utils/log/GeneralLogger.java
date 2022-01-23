@@ -11,39 +11,39 @@ import java.util.Date;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 class GeneralLogger extends BaseLogger {
 
     private static final String TAG = "GeneralLogger";
 
-    private static final String GENERAL_SUB_PATH = "general" + File.separator;
+    static final String GENERAL_SUB_PATH = "general" + File.separator;
     private static final String LOG_FILE_PREFIX = "log_";
 
-    private long mMaxFileSize = 4 * 1024 * 1024;
     private String mFolder;
     private String mLogPath;
 
-    void setMaxFileSize(long maxFileSize) {
-        mMaxFileSize = maxFileSize;
+    @NonNull
+    @Override
+    protected String getTag() {
+        return TAG;
     }
 
-    void setFolder(@NonNull String basePath) {
+    @NonNull
+    @Override
+    protected String getHandelThreadName() {
+        return "GeneralLoggerHandlerThread";
+    }
+
+    @Override
+    protected void setFolder(@NonNull String basePath) {
         mFolder = basePath.endsWith(File.separator) ? basePath + GENERAL_SUB_PATH : basePath + File.separator + GENERAL_SUB_PATH;
         if (DEBUG) {
             Log.i(TAG, "setFolder() basePath: " + basePath + ", folder: " + mFolder);
         }
     }
 
-    @Override
-    protected String getTag() {
-        return TAG;
-    }
-
-    @Override
-    protected String getHandelThreadName() {
-        return "GeneralLoggerHandlerThread";
-    }
-
+    @Nullable
     protected String getLogPath(long time) {
         if (DEBUG) {
             if (mLogPath != null) {
@@ -55,6 +55,13 @@ class GeneralLogger extends BaseLogger {
             String logName = LOG_FILE_PREFIX + fmt.format(new Date(time)) + LOG_FILE_EXTENSION;
             mLogPath = mFolder + logName;
         }
+        // log_20220123_100319.txt
         return mLogPath;
+    }
+
+    @Nullable
+    @Override
+    protected String getLogPath(long time, String tag) {
+        return null;
     }
 }

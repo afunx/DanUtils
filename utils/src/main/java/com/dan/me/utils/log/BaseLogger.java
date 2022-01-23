@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.dan.me.utils.log.LogUtils.LEVEL_D;
 import static com.dan.me.utils.log.LogUtils.LEVEL_D_STR;
@@ -32,7 +33,7 @@ import static com.dan.me.utils.log.LogUtils.LEVEL_W_STR;
 
 abstract class BaseLogger implements Handler.Callback {
 
-    protected static final boolean DEBUG = false;
+    protected static final boolean DEBUG = true;
 
     private static final String NEW_LINE = System.getProperty("line.separator");
     protected static final String LOG_FILE_EXTENSION = ".txt";
@@ -47,6 +48,8 @@ abstract class BaseLogger implements Handler.Callback {
     private final Date mDate = new Date();
     private final SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 
+    protected long mMaxFileSize = 4 * 1024 * 1024;
+
     private String mPackageName = "";
 
     BaseLogger() {
@@ -60,11 +63,23 @@ abstract class BaseLogger implements Handler.Callback {
         mPackageName = packageName;
     }
 
+    void setMaxFileSize(long maxFileSize) {
+        mMaxFileSize = maxFileSize;
+    }
+
+    @NonNull
     protected abstract String getTag();
 
+    @NonNull
     protected abstract String getHandelThreadName();
 
+    protected abstract void setFolder(@NonNull String basePath);
+
+    @Nullable
     protected abstract String getLogPath(long time);
+
+    @Nullable
+    protected abstract String getLogPath(long time, String tag);
 
     void log(int level, final String tag, final String msg) {
         // 多线程访问时，即使存在同步问题，也不会超过1ms的误差
@@ -117,6 +132,12 @@ abstract class BaseLogger implements Handler.Callback {
         }
         String content = compose(levelStr, pid, tid, timeStr, tag, message);
         String logPath = getLogPath(time);
+        if (logPath == null) {
+            logPath = getLogPath(time, tag);
+        }
+        if (logPath == null) {
+            throw new NullPointerException("logPath is null");
+        }
         if (DEBUG) {
             Log.i(mTag, "logPath: " + logPath);
             Log.i(mTag, "content: " + content);
