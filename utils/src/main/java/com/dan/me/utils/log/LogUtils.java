@@ -41,6 +41,8 @@ public class LogUtils {
 
     private static final SpecializedLogger sSpecializedLogger = new SpecializedLogger();
 
+    private static final CrashLogger sCrashLogger = new CrashLogger();
+
     private LogUtils(boolean systemLogEnabled, boolean generalSaveEnabled, boolean specializedSaveEnabled) {
         mSystemLogEnabled = systemLogEnabled;
         mGeneralSaveEnabled = generalSaveEnabled;
@@ -64,6 +66,9 @@ public class LogUtils {
         sSpecializedLogger.setPackageName(appContext.getPackageName());
         sSpecializedLogger.setFolder(logUtilsOptions.getBasePath());
         sSpecializedLogger.setMaxFileSize(logUtilsOptions.getSpecializedFileMaxSize());
+        sCrashLogger.setPackageName(appContext.getPackageName());
+        sCrashLogger.setFolder(logUtilsOptions.getBasePath());
+        Thread.setDefaultUncaughtExceptionHandler(new CrashLogger.CrashHandler(sCrashLogger));
     }
 
     // 虽然，这个实现会在最前面多一些内容。但是，考虑到多线程情况，这个是目前想到最好的实现。
