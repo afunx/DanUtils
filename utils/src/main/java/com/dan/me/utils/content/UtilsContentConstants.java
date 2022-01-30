@@ -4,6 +4,8 @@
 
 package com.dan.me.utils.content;
 
+import android.net.Uri;
+
 public interface UtilsContentConstants {
 
     // 是否开启content模块的打印
@@ -25,6 +27,11 @@ public interface UtilsContentConstants {
     String KEY_COLUMN_NAME = "_KEY";
     String VALUE_COLUMN_NAME = "VALUE";
 
+    // boolean类型True
+    int BOOLEAN_TRUE = 1;
+    // boolean类型false
+    int BOOLEAN_FALSE = 0;
+
     // 各种类型的code值
     int BOOLEAN_CODE = 0;
     int INTEGER_CODE = 1;
@@ -32,9 +39,9 @@ public interface UtilsContentConstants {
     int STRING_CODE = 3;
 
     // 各种ACTION字符串
+    String ACTION_INSERT = "insert";
     String ACTION_UPDATE = "update";
     String ACTION_DELETE = "delete";
-
 
     // '#'为转义符
     // '/'为分割符
@@ -47,4 +54,10 @@ public interface UtilsContentConstants {
     String POUND_ESCAPE = "##";
     String SPLASH_ORIGIN = "/";
     String SPLASH_ESCAPE = "#/";
+
+    Uri URI_BOOLEAN = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + BOOLEAN_TABLE_NAME);
+    Uri URI_INTEGER = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + INTEGER_TABLE_NAME);
+    Uri URI_LONG = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + LONG_TABLE_NAME);
+    Uri URI_STRING = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + STRING_TABLE_NAME);
+
 }

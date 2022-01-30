@@ -8,6 +8,12 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <application android:requestLegacyExternalStorage="true" />
+    <application android:requestLegacyExternalStorage="true">
+        <provider
+            android:name="com.dan.me.utils.content.UtilsContentProvider"
+            android:authorities="com.dan.me.utils.content.utilscontentprovider"
+            android:enabled="true"
+            android:exported="true" />
+    </application>
 
 </manifest>

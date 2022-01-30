@@ -71,6 +71,13 @@ public class LogUtils {
         Thread.setDefaultUncaughtExceptionHandler(new CrashLogger.CrashHandler(sCrashLogger));
     }
 
+    /**
+     * 清除LogUtils的配置参数
+     */
+    public static void clearLogUtilsOptions() {
+        sLogUtilsOptions = null;
+    }
+
     // 虽然，这个实现会在最前面多一些内容。但是，考虑到多线程情况，这个是目前想到最好的实现。
     private void logLong(final String tag, final String message, int level) {
         // 第一部分日志
