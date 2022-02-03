@@ -10,13 +10,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.NonNull;
 
-import static com.dan.me.utils.content.UtilsContentConstants.BOOLEAN_TABLE_NAME;
+import static com.dan.me.utils.content.UtilsContentConstants.BOOLEAN_DB_TABLE_NAME;
 import static com.dan.me.utils.content.UtilsContentConstants.DATABASE_NAME;
 import static com.dan.me.utils.content.UtilsContentConstants.DATABASE_VERSION;
-import static com.dan.me.utils.content.UtilsContentConstants.INTEGER_TABLE_NAME;
+import static com.dan.me.utils.content.UtilsContentConstants.INTEGER_DB_TABLE_NAME;
 import static com.dan.me.utils.content.UtilsContentConstants.KEY_COLUMN_NAME;
-import static com.dan.me.utils.content.UtilsContentConstants.LONG_TABLE_NAME;
-import static com.dan.me.utils.content.UtilsContentConstants.STRING_TABLE_NAME;
+import static com.dan.me.utils.content.UtilsContentConstants.LONG_DB_TABLE_NAME;
+import static com.dan.me.utils.content.UtilsContentConstants.STRING_DB_TABLE_NAME;
 import static com.dan.me.utils.content.UtilsContentConstants.VALUE_COLUMN_NAME;
 
 class UtilsContentDBHelper extends SQLiteOpenHelper {
@@ -27,19 +27,19 @@ class UtilsContentDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + BOOLEAN_TABLE_NAME + "("
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + BOOLEAN_DB_TABLE_NAME + "("
                 + KEY_COLUMN_NAME + " TEXT PRIMARY KEY NOT NULL,"
                 + VALUE_COLUMN_NAME + " INT NOT NULL"
                 + ")");
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + INTEGER_TABLE_NAME + "("
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + INTEGER_DB_TABLE_NAME + "("
                 + KEY_COLUMN_NAME +" TEXT PRIMARY KEY NOT NULL,"
                 + VALUE_COLUMN_NAME +" INT NOT NULL"
                 + ")");
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + LONG_TABLE_NAME + "("
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + LONG_DB_TABLE_NAME + "("
                 + KEY_COLUMN_NAME + " TEXT PRIMARY KEY NOT NULL,"
                 + VALUE_COLUMN_NAME + " LONG NOT NULL"
                 + ")");
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + STRING_TABLE_NAME + "("
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + STRING_DB_TABLE_NAME + "("
                 + KEY_COLUMN_NAME + " TEXT PRIMARY KEY NOT NULL,"
                 + VALUE_COLUMN_NAME + " TEXT NOT NULL"
                 + ")");

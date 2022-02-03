@@ -7,7 +7,7 @@ package com.dan.me.utils.content;
 import androidx.annotation.NonNull;
 
 /**
- * 使用外观模式，为content的唯一对外接口。主要用来全应用跨进程修改变量数值，以及监听数值的变化。
+ * 使用外观模式，为content的db对外接口。主要用来全应用跨进程修改变量数值，以及监听数值的变化。
  */
 public class UtilsContentHelper {
 

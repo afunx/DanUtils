@@ -36,5 +36,7 @@ public class UtilsContentInit {
         }
         UtilsContentResolver.setAppContent(appContext);
         UtilsContentNotifier.get().registerContentObserver(appContext);
+        UtilsContentCacheResolver.setAppContent(appContext);
+        UtilsContentCacheNotifier.get().registerContentObserver(appContext);
     }
 }

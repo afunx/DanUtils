@@ -19,24 +19,24 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-class UtilsContentNotifier extends ContentObserver {
+class UtilsContentCacheNotifier extends ContentObserver {
 
     private static final char SPLIT_CHAR = UtilsContentConstants.SPLIT_CHAR;
     private static final int CONTENT_HEADER_LENGTH = "content://".length();
 
-    private static final Uri URI_DB_BOOLEAN = UtilsContentConstants.URI_DB_BOOLEAN;
-    private static final Uri URI_DB_INTEGER = UtilsContentConstants.URI_DB_INTEGER;
-    private static final Uri URI_DB_LONG = UtilsContentConstants.URI_DB_LONG;
-    private static final Uri URI_DB_STRING = UtilsContentConstants.URI_DB_STRING;
+    private static final Uri URI_CACHE_BOOLEAN = UtilsContentConstants.URI_CACHE_BOOLEAN;
+    private static final Uri URI_CACHE_INTEGER = UtilsContentConstants.URI_CACHE_INTEGER;
+    private static final Uri URI_CACHE_LONG = UtilsContentConstants.URI_CACHE_LONG;
+    private static final Uri URI_CACHE_STRING = UtilsContentConstants.URI_CACHE_STRING;
 
-    private static final String BOOLEAN_TABLE_NAME = UtilsContentConstants.BOOLEAN_DB_TABLE_NAME;
-    private static final String INTEGER_TABLE_NAME = UtilsContentConstants.INTEGER_DB_TABLE_NAME;
-    private static final String LONG_TABLE_NAME = UtilsContentConstants.LONG_DB_TABLE_NAME;
-    private static final String STRING_TABLE_NAME = UtilsContentConstants.STRING_DB_TABLE_NAME;
+    private static final String BOOLEAN_CACHE_TABLE_NAME = UtilsContentConstants.BOOLEAN_CACHE_TABLE_NAME;
+    private static final String INTEGER_CACHE_TABLE_NAME = UtilsContentConstants.INTEGER_CACHE_TABLE_NAME;
+    private static final String LONG_CACHE_TABLE_NAME = UtilsContentConstants.LONG_CACHE_TABLE_NAME;
+    private static final String STRING_CACHE_TABLE_NAME = UtilsContentConstants.STRING_CACHE_TABLE_NAME;
 
-    private static final String ACTION_DB_INSERT = UtilsContentConstants.ACTION_DB_INSERT;
-    private static final String ACTION_DB_UPDATE = UtilsContentConstants.ACTION_DB_UPDATE;
-    private static final String ACTION_DB_DELETE = UtilsContentConstants.ACTION_DB_DELETE;
+    private static final String ACTION_CACHE_INSERT = UtilsContentConstants.ACTION_CACHE_INSERT;
+    private static final String ACTION_CACHE_UPDATE = UtilsContentConstants.ACTION_CACHE_UPDATE;
+    private static final String ACTION_CACHE_DELETE = UtilsContentConstants.ACTION_CACHE_DELETE;
 
     private static final int BOOLEAN_TRUE = UtilsContentConstants.BOOLEAN_TRUE;
 
@@ -53,11 +53,11 @@ class UtilsContentNotifier extends ContentObserver {
     private static final HandlerThread sHandlerThread;
 
     static {
-        sHandlerThread = new HandlerThread("UtilsContentNotifierHandlerThread");
+        sHandlerThread = new HandlerThread("UtilsContentCacheNotifierHandlerThread");
         sHandlerThread.start();
     }
 
-    private UtilsContentNotifier() {
+    private UtilsContentCacheNotifier() {
         /*
          * 出于效率考虑，不使用Looper.getMainLooper()，
          * 若回调时，需要使用UI线程，则由回调接收者自行切换。
@@ -66,10 +66,10 @@ class UtilsContentNotifier extends ContentObserver {
     }
 
     private static class Singleton {
-        private static final UtilsContentNotifier instance = new UtilsContentNotifier();
+        private static final UtilsContentCacheNotifier instance = new UtilsContentCacheNotifier();
     }
 
-    static UtilsContentNotifier get() {
+    static UtilsContentCacheNotifier get() {
         return Singleton.instance;
     }
 
@@ -80,8 +80,8 @@ class UtilsContentNotifier extends ContentObserver {
         }
         String uriString = uri.toString();
         int start = uriString.indexOf(SPLIT_CHAR, CONTENT_HEADER_LENGTH);
-        // /string/db_insert/key/value/
-        // /string/db_delete/key/
+        // /string/cache_insert/key/value/
+        // /string/cache_delete/key/
         String[] splitList = UtilsContentEscape.split(uriString.substring(start));
         if (splitList.length != 3 && splitList.length != 4) {
             throw new IllegalArgumentException("splitList is invalid: " + Arrays.toString(splitList));
@@ -90,11 +90,11 @@ class UtilsContentNotifier extends ContentObserver {
         final String action = splitList[1];
         final String key = splitList[2];
         switch (action) {
-            case ACTION_DB_DELETE:
+            case ACTION_CACHE_DELETE:
                 doCallbackOnDeleted(table, key);
                 break;
-            case ACTION_DB_INSERT:
-            case ACTION_DB_UPDATE:
+            case ACTION_CACHE_INSERT:
+            case ACTION_CACHE_UPDATE:
                 final String value =  splitList[3];
                 doCallbackOnChanged(table, key, value);
                 break;
@@ -104,10 +104,10 @@ class UtilsContentNotifier extends ContentObserver {
     }
 
     void registerContentObserver(@NonNull Context context) {
-        context.getContentResolver().registerContentObserver(URI_DB_INTEGER, true, this);
-        context.getContentResolver().registerContentObserver(URI_DB_LONG, true, this);
-        context.getContentResolver().registerContentObserver(URI_DB_STRING, true, this);
-        context.getContentResolver().registerContentObserver(URI_DB_BOOLEAN, true, this);
+        context.getContentResolver().registerContentObserver(URI_CACHE_INTEGER, true, this);
+        context.getContentResolver().registerContentObserver(URI_CACHE_LONG, true, this);
+        context.getContentResolver().registerContentObserver(URI_CACHE_STRING, true, this);
+        context.getContentResolver().registerContentObserver(URI_CACHE_BOOLEAN, true, this);
     }
 
     void unregisterContentObserver(@NonNull Context context) {
@@ -165,13 +165,13 @@ class UtilsContentNotifier extends ContentObserver {
         final T oldValue = typeMap.get(key);
         final T newValue;
         if (clazz.getName().equals(Boolean.class.getName())) {
-            newValue = (T) UtilsContentResolver.getBoolean(key);
+            newValue = (T) UtilsContentCacheResolver.getBoolean(key);
         } else if (clazz.getName().equals(Integer.class.getName())) {
-            newValue = (T) UtilsContentResolver.getInt(key);
+            newValue = (T) UtilsContentCacheResolver.getInt(key);
         } else if (clazz.getName().equals(Long.class.getName())) {
-            newValue = (T) UtilsContentResolver.getLong(key);
+            newValue = (T) UtilsContentCacheResolver.getLong(key);
         } else if (clazz.getName().equals(String.class.getName())) {
-            newValue = (T) UtilsContentResolver.getString(key);
+            newValue = (T) UtilsContentCacheResolver.getString(key);
         } else {
             throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
         }
@@ -194,7 +194,7 @@ class UtilsContentNotifier extends ContentObserver {
 
     private void doCallbackOnChanged(@NonNull String table, @NonNull String key, @NonNull String value) {
         switch (table) {
-            case BOOLEAN_TABLE_NAME: {
+            case BOOLEAN_CACHE_TABLE_NAME: {
                 Boolean oldValue = mBooleanMap.get(key);
                 boolean newValue = Integer.parseInt(value) == BOOLEAN_TRUE;
                 if (oldValue == null || oldValue != newValue) {
@@ -208,7 +208,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case INTEGER_TABLE_NAME: {
+            case INTEGER_CACHE_TABLE_NAME: {
                 Integer oldValue = mIntegerMap.get(key);
                 int newValue = Integer.parseInt(value);
                 if (oldValue == null || oldValue != newValue) {
@@ -222,7 +222,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case LONG_TABLE_NAME: {
+            case LONG_CACHE_TABLE_NAME: {
                 Long oldValue = mLongMap.get(key);
                 long newValue = Long.parseLong(value);
                 if (oldValue == null || oldValue != newValue) {
@@ -236,7 +236,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case STRING_TABLE_NAME: {
+            case STRING_CACHE_TABLE_NAME: {
                 String oldValue = mStringMap.get(key);
                 @SuppressWarnings("UnnecessaryLocalVariable")/* 代码看上去和其他类似 */
                 String newValue = value;
@@ -258,7 +258,7 @@ class UtilsContentNotifier extends ContentObserver {
 
     private void doCallbackOnDeleted(@NonNull String table, @NonNull String key) {
         switch (table) {
-            case BOOLEAN_TABLE_NAME: {
+            case BOOLEAN_CACHE_TABLE_NAME: {
                 mBooleanMap.remove(key);
                 List<UtilsContentCallback<Boolean>> utilsContentCallbacks = mBooleanCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {
@@ -268,7 +268,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case INTEGER_TABLE_NAME: {
+            case INTEGER_CACHE_TABLE_NAME: {
                 mIntegerMap.remove(key);
                 List<UtilsContentCallback<Integer>> utilsContentCallbacks = mIntegerCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {
@@ -278,7 +278,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case LONG_TABLE_NAME: {
+            case LONG_CACHE_TABLE_NAME: {
                 mLongMap.remove(key);
                 List<UtilsContentCallback<Long>> utilsContentCallbacks = mLongCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {
@@ -288,7 +288,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case STRING_TABLE_NAME: {
+            case STRING_CACHE_TABLE_NAME: {
                 mStringMap.remove(key);
                 List<UtilsContentCallback<String>> utilsContentCallbacks = mStringCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {

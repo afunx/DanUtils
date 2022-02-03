@@ -19,13 +19,22 @@ public interface UtilsContentConstants {
     // 数据库库名
     String DATABASE_NAME = "dan_utils_content.db";
     // 数据库表名
-    String BOOLEAN_TABLE_NAME = "boolean";
-    String INTEGER_TABLE_NAME = "integer";
-    String LONG_TABLE_NAME = "long";
-    String STRING_TABLE_NAME = "string";
+    String BOOLEAN_DB_TABLE_NAME = "boolean_db";
+    String INTEGER_DB_TABLE_NAME = "integer_db";
+    String LONG_DB_TABLE_NAME = "long_db";
+    String STRING_DB_TABLE_NAME = "string_db";
     // 数据库列名
     String KEY_COLUMN_NAME = "_KEY";
     String VALUE_COLUMN_NAME = "VALUE";
+
+    // cache数据库表名（虚拟数据库表，实际并不存在，仅仅是使用Map实现）
+    String BOOLEAN_CACHE_TABLE_NAME = "boolean_cache";
+    String INTEGER_CACHE_TABLE_NAME = "integer_cache";
+    String LONG_CACHE_TABLE_NAME = "long_cache";
+    String STRING_CACHE_TABLE_NAME = "string_cache";
+    // cache数据库列名
+    String KEY_CACHE_COLUMN_NAME = "_KEY_CACHE";
+    String VALUE_CACHE_COLUMN_NAME = "VALUE_CACHE";
 
     // boolean类型True
     int BOOLEAN_TRUE = 1;
@@ -39,9 +48,12 @@ public interface UtilsContentConstants {
     int STRING_CODE = 3;
 
     // 各种ACTION字符串
-    String ACTION_INSERT = "insert";
-    String ACTION_UPDATE = "update";
-    String ACTION_DELETE = "delete";
+    String ACTION_DB_INSERT = "db_insert";
+    String ACTION_DB_UPDATE = "db_update";
+    String ACTION_DB_DELETE = "db_delete";
+    String ACTION_CACHE_INSERT = "cache_insert";
+    String ACTION_CACHE_UPDATE = "cache_update";
+    String ACTION_CACHE_DELETE = "cache_delete";
 
     // '#'为转义符
     // '/'为分割符
@@ -55,9 +67,13 @@ public interface UtilsContentConstants {
     String SPLASH_ORIGIN = "/";
     String SPLASH_ESCAPE = "#/";
 
-    Uri URI_BOOLEAN = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + BOOLEAN_TABLE_NAME);
-    Uri URI_INTEGER = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + INTEGER_TABLE_NAME);
-    Uri URI_LONG = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + LONG_TABLE_NAME);
-    Uri URI_STRING = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + STRING_TABLE_NAME);
+    Uri URI_DB_BOOLEAN = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + BOOLEAN_DB_TABLE_NAME);
+    Uri URI_DB_INTEGER = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + INTEGER_DB_TABLE_NAME);
+    Uri URI_DB_LONG = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + LONG_DB_TABLE_NAME);
+    Uri URI_DB_STRING = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + STRING_DB_TABLE_NAME);
 
+    Uri URI_CACHE_BOOLEAN = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + BOOLEAN_CACHE_TABLE_NAME);
+    Uri URI_CACHE_INTEGER = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + INTEGER_CACHE_TABLE_NAME);
+    Uri URI_CACHE_LONG = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + LONG_CACHE_TABLE_NAME);
+    Uri URI_CACHE_STRING = Uri.parse("content://" + AUTHORITY + SPLIT_CHAR + STRING_CACHE_TABLE_NAME);
 }
