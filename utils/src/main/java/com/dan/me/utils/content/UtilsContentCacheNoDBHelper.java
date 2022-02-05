@@ -19,6 +19,7 @@ public class UtilsContentCacheNoDBHelper {
     private final Map<String, Integer> mIntegerMap = new HashMap<>();
     private final Map<String, Long> mLongMap = new HashMap<>();
     private final Map<String, String> mStringMap = new HashMap<>();
+    private final Map<String, Object> mObjectMap = new HashMap<>();
 
     Cursor query(@NonNull UtilsContentTypeEnum contentTypeEnum, @NonNull String key) {
         switch (contentTypeEnum) {
@@ -30,6 +31,8 @@ public class UtilsContentCacheNoDBHelper {
                 return getLongCursor(key);
             case CACHE_STRING:
                 return getStringCursor(key);
+            case CACHE_OBJECT:
+                return getObjectCursor(key);
             default:
                 throw new IllegalArgumentException("contentTypeEnum: " + contentTypeEnum + " is invalid");
         }
@@ -49,6 +52,9 @@ public class UtilsContentCacheNoDBHelper {
             case CACHE_STRING:
                 putString(key, (String) value);
                 break;
+            case CACHE_OBJECT:
+                putObject(key, value);
+                break;
             default:
                 throw new IllegalArgumentException("contentTypeEnum: " + contentTypeEnum + " is invalid");
         }
@@ -64,6 +70,8 @@ public class UtilsContentCacheNoDBHelper {
                 return deleteLong(key) == null ? 0 : 1;
             case CACHE_STRING:
                 return deleteString(key) == null ? 0 : 1;
+            case CACHE_OBJECT:
+                return deleteObject(key) == null ? 0 : 1;
             default:
                 throw new IllegalArgumentException("contentTypeEnum: " + contentTypeEnum + " is invalid");
         }
@@ -125,6 +133,20 @@ public class UtilsContentCacheNoDBHelper {
         return getCursor(key, String.class);
     }
 
+    private void putObject(@NonNull String key, @NonNull Object value) {
+        mObjectMap.put(key, value);
+    }
+
+    @Nullable
+    private Object deleteObject(@NonNull String key) {
+        return mObjectMap.remove(key);
+    }
+
+    @NonNull
+    private Cursor getObjectCursor(@NonNull String key) {
+        return getCursor(key, Object.class);
+    }
+
     private Cursor getCursor(String key, Class<?> clazz) {
         final Object value;
         if (clazz.getName().equals(Integer.class.getName())) {
@@ -136,7 +158,7 @@ public class UtilsContentCacheNoDBHelper {
         } else if (clazz.getName().equals(Boolean.class.getName())) {
             value = mBooleanMap.get(key);
         } else {
-            throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
+            value = mObjectMap.get(key);
         }
         final int count = value == null ? 0 : 1;
 

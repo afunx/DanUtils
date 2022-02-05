@@ -9,61 +9,62 @@ public class UtilsContentCacheHelper {
 
     private static final UtilsContentCacheNotifier sUtilsContentCacheNotifier = UtilsContentCacheNotifier.get();
 
+
     /**
-     * 设置String变量
+     * 设置Boolean变量
      *
-     * @param key     键值
-     * @param value   String值（非空）
+     * @param key   键值
+     * @param value boolean值
      */
-    public static void putString(String key, String value) {
-        UtilsContentCacheResolver.putString(key, value);
+    public static void putBoolean(String key, boolean value) {
+        UtilsContentCacheResolver.putBoolean(key, value);
     }
 
     /**
-     * 查询String变量
+     * 查询Boolean变量
      *
-     * @param key     键值
-     * @return String值或null（若不存在）
+     * @param key 键值
+     * @return Boolean值或null（若不存在）
      */
-    public static String getString(String key) {
-        return UtilsContentCacheResolver.getString(key);
+    public static Boolean getBoolean(String key) {
+        return UtilsContentCacheResolver.getBoolean(key);
     }
 
     /**
-     * 删除String变量
+     * 删除Boolean变量
      *
-     * @param key     键值
+     * @param key 键值
      */
-    public static void deleteString(String key) {
-        UtilsContentCacheResolver.deleteString(key);
+    public static void deleteBoolean(String key) {
+        UtilsContentCacheResolver.deleteBoolean(key);
     }
 
     /**
-     * 注册String变量监听器
-     *
-     * @param key         键值
-     * @param callback    回调
-     */
-    public static void registerStringCallback(String key, UtilsContentCallback<String> callback) {
-        sUtilsContentCacheNotifier.registerStringCallback(key, callback);
-    }
-
-    /**
-     * 注销String变量监听器
+     * 注册Boolean变量监听器
      *
      * @param key      键值
      * @param callback 回调
      */
-    public static void unregisterStringCallback(String key, UtilsContentCallback<String> callback) {
-        sUtilsContentCacheNotifier.unregisterStringCallback(key, callback);
+    public static void registerBooleanCallback(String key, UtilsContentCallback<Boolean> callback) {
+        sUtilsContentCacheNotifier.registerBooleanCallback(key, callback);
     }
+
+    /**
+     * 注销Boolean变量监听器
+     *
+     * @param key      键值
+     * @param callback 回调
+     */
+    public static void unregisterBooleanCallback(String key, UtilsContentCallback<Boolean> callback) {
+        sUtilsContentCacheNotifier.unregisterBooleanCallback(key, callback);
+    }
+
 
     /**
      * 设置Integer变量
      *
-
-     * @param key     键值
-     * @param value   int值
+     * @param key   键值
+     * @param value int值
      */
     public static void putInteger(String key, int value) {
         UtilsContentCacheResolver.putInt(key, value);
@@ -72,8 +73,7 @@ public class UtilsContentCacheHelper {
     /**
      * 查询Integer变量
      *
-
-     * @param key     键值
+     * @param key 键值
      * @return Integer值或null（若不存在）
      */
     public static Integer getInteger(String key) {
@@ -83,7 +83,7 @@ public class UtilsContentCacheHelper {
     /**
      * 删除Integer变量
      *
-     * @param key     键值
+     * @param key 键值
      */
     public static void deleteInteger(String key) {
         UtilsContentCacheResolver.deleteInt(key);
@@ -92,8 +92,8 @@ public class UtilsContentCacheHelper {
     /**
      * 注册Integer变量监听器
      *
-     * @param key         键值
-     * @param callback    回调
+     * @param key      键值
+     * @param callback 回调
      */
     public static void registerIntegerCallback(String key, UtilsContentCallback<Integer> callback) {
         sUtilsContentCacheNotifier.registerIntegerCallback(key, callback);
@@ -112,8 +112,8 @@ public class UtilsContentCacheHelper {
     /**
      * 设置Long变量
      *
-     * @param key     键值
-     * @param value   long值
+     * @param key   键值
+     * @param value long值
      */
     public static void putLong(String key, long value) {
         UtilsContentCacheResolver.putLong(key, value);
@@ -122,7 +122,7 @@ public class UtilsContentCacheHelper {
     /**
      * 查询Long变量
      *
-     * @param key     键值
+     * @param key 键值
      * @return Long值或null（若不存在）
      */
     public static Long getLong(String key) {
@@ -132,7 +132,7 @@ public class UtilsContentCacheHelper {
     /**
      * 删除Long变量
      *
-     * @param key     键值
+     * @param key 键值
      */
     public static void deleteLong(String key) {
         UtilsContentCacheResolver.deleteLong(key);
@@ -141,8 +141,8 @@ public class UtilsContentCacheHelper {
     /**
      * 注册Long变量监听器
      *
-     * @param key         键值
-     * @param callback    回调
+     * @param key      键值
+     * @param callback 回调
      */
     public static void registerLongCallback(String key, UtilsContentCallback<Long> callback) {
         sUtilsContentCacheNotifier.registerLongCallback(key, callback);
@@ -159,51 +159,100 @@ public class UtilsContentCacheHelper {
     }
 
     /**
-     * 设置Boolean变量
+     * 设置String变量
      *
-     * @param key     键值
-     * @param value   boolean值
+     * @param key   键值
+     * @param value String值（非空）
      */
-    public static void putBoolean(String key, boolean value) {
-        UtilsContentCacheResolver.putBoolean(key, value);
+    public static void putString(String key, String value) {
+        UtilsContentCacheResolver.putString(key, value);
     }
 
     /**
-     * 查询Boolean变量
+     * 查询String变量
      *
-     * @param key     键值
-     * @return Boolean值或null（若不存在）
+     * @param key 键值
+     * @return String值或null（若不存在）
      */
-    public static Boolean getBoolean(String key) {
-        return UtilsContentCacheResolver.getBoolean(key);
+    public static String getString(String key) {
+        return UtilsContentCacheResolver.getString(key);
     }
 
     /**
-     * 删除Boolean变量
+     * 删除String变量
      *
-     * @param key     键值
+     * @param key 键值
      */
-    public static void deleteBoolean(String key) {
-        UtilsContentCacheResolver.deleteBoolean(key);
+    public static void deleteString(String key) {
+        UtilsContentCacheResolver.deleteString(key);
     }
 
     /**
-     * 注册Boolean变量监听器
-     *
-     * @param key         键值
-     * @param callback    回调
-     */
-    public static void registerBooleanCallback(String key, UtilsContentCallback<Boolean> callback) {
-        sUtilsContentCacheNotifier.registerBooleanCallback(key, callback);
-    }
-
-    /**
-     * 注销Boolean变量监听器
+     * 注册String变量监听器
      *
      * @param key      键值
      * @param callback 回调
      */
-    public static void unregisterBooleanCallback(String key, UtilsContentCallback<Boolean> callback) {
-        sUtilsContentCacheNotifier.unregisterBooleanCallback(key, callback);
+    public static void registerStringCallback(String key, UtilsContentCallback<String> callback) {
+        sUtilsContentCacheNotifier.registerStringCallback(key, callback);
+    }
+
+    /**
+     * 注销String变量监听器
+     *
+     * @param key      键值
+     * @param callback 回调
+     */
+    public static void unregisterStringCallback(String key, UtilsContentCallback<String> callback) {
+        sUtilsContentCacheNotifier.unregisterStringCallback(key, callback);
+    }
+
+    /**
+     * 设置Object变量
+     *
+     * @param key   键值
+     * @param value Object值（非空）
+     */
+    public static void putObject(String key, Object value) {
+        UtilsContentCacheResolver.putObject(key, value);
+    }
+
+    /**
+     * 查询Object变量
+     *
+     * @param key 键值
+     * @return Object值或null（若不存在）
+     */
+    public static Object getObject(String key) {
+        return UtilsContentCacheResolver.getObject(key);
+    }
+
+    /**
+     * 删除Object变量
+     *
+     * @param key 键值
+     */
+    public static void deleteObject(String key) {
+        UtilsContentCacheResolver.deleteObject(key);
+    }
+
+    /**
+     * 注册Object变量监听器
+     *
+     * @param key      键值
+     * @param callback 回调
+     */
+    public static void registerObjectCallback(String key, UtilsContentCallback<Object> callback) {
+        sUtilsContentCacheNotifier.registerObjectCallback(key, callback);
+    }
+
+    /**
+     * 注销Object变量监听器
+     *
+     * @param key      键值
+     * @param callback 回调
+     */
+    public static void unregisterObjectCallback(String key, UtilsContentCallback<Object> callback) {
+        sUtilsContentCacheNotifier.unregisterObjectCallback(key, callback);
     }
 }

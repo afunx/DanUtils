@@ -150,6 +150,7 @@ public class UtilsContentCacheResolver {
             throw new NullPointerException("putObject() objectString is null");
         }
         values.put(VALUE_COLUMN_CACHE_NAME, objectString);
+        sAppContext.getContentResolver().insert(URI_CACHE_OBJECT, values);
     }
 
     @Nullable

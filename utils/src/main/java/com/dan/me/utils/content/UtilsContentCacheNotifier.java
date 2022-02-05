@@ -151,6 +151,14 @@ class UtilsContentCacheNotifier extends ContentObserver {
         unregisterCallback(key, callback, mStringCallbacksMap);
     }
 
+    synchronized void registerObjectCallback(@NonNull String key, @NonNull UtilsContentCallback<Object> callback) {
+        registerCallback(key, callback, Object.class, mObjectMap, mObjectCallbacksMap);
+    }
+
+    synchronized void unregisterObjectCallback(@NonNull String key, @NonNull UtilsContentCallback<Object> callback) {
+        unregisterCallback(key, callback, mObjectCallbacksMap);
+    }
+
     @SuppressWarnings("unchecked")
     private <T> void registerCallback(@NonNull String key, @NonNull UtilsContentCallback<T> callback,
                                       @NonNull Class<T> clazz, @NonNull Map<String, T> typeMap,
@@ -269,6 +277,7 @@ class UtilsContentCacheNotifier extends ContentObserver {
                             doRealCallbackOnChanged(utilsContentCallback, oldValue, newValue);
                         }
                     }
+                    mObjectMap.put(key, newValue);
                 }
             }
             break;
