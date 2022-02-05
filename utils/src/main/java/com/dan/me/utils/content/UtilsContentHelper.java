@@ -209,4 +209,54 @@ public class UtilsContentHelper {
     public static void unregisterStringCallback(@NonNull String key, @NonNull UtilsContentCallback<String> callback) {
         sUtilsContentNotifier.unregisterStringCallback(key, callback);
     }
+
+    /**
+     * 设置Object变量
+     *
+     * @param key     键值
+     * @param value   Object值（非空）
+     */
+    public static void putObject(@NonNull String key, @NonNull Object value) {
+        UtilsContentResolver.putObject(key, value);
+    }
+
+    /**
+     * 查询Object变量
+     *
+     * @param key     键值
+     * @return Object值或null（若不存在）
+     */
+    public static Object getObject(@NonNull String key) {
+        return UtilsContentResolver.getObject(key);
+    }
+
+    /**
+     * 删除Object变量
+     *
+     * @param key     键值
+     */
+    public static void deleteObject(@NonNull String key) {
+        UtilsContentResolver.deleteObject(key);
+    }
+
+    /**
+     * 注册Object变量监听器
+     *
+     * @param key         键值
+     * @param callback    回调
+     */
+    public static void registerObjectCallback(@NonNull String key, @NonNull UtilsContentCallback<Object> callback) {
+        sUtilsContentNotifier.registerObjectCallback(key, callback);
+    }
+
+    /**
+     * 注销Object变量监听器
+     *
+     * @param key      键值
+     * @param callback 回调
+     */
+    public static void unregisterObjectCallback(@NonNull String key, @NonNull UtilsContentCallback<Object> callback) {
+        sUtilsContentNotifier.unregisterObjectCallback(key, callback);
+    }
+
 }

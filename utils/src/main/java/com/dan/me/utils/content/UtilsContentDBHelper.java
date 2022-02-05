@@ -16,6 +16,7 @@ import static com.dan.me.utils.content.UtilsContentConstants.DATABASE_VERSION;
 import static com.dan.me.utils.content.UtilsContentConstants.INTEGER_DB_TABLE_NAME;
 import static com.dan.me.utils.content.UtilsContentConstants.KEY_COLUMN_NAME;
 import static com.dan.me.utils.content.UtilsContentConstants.LONG_DB_TABLE_NAME;
+import static com.dan.me.utils.content.UtilsContentConstants.OBJECT_DB_TABLE_NAME;
 import static com.dan.me.utils.content.UtilsContentConstants.STRING_DB_TABLE_NAME;
 import static com.dan.me.utils.content.UtilsContentConstants.VALUE_COLUMN_NAME;
 
@@ -40,6 +41,10 @@ class UtilsContentDBHelper extends SQLiteOpenHelper {
                 + VALUE_COLUMN_NAME + " LONG NOT NULL"
                 + ")");
         db.execSQL("CREATE TABLE IF NOT EXISTS " + STRING_DB_TABLE_NAME + "("
+                + KEY_COLUMN_NAME + " TEXT PRIMARY KEY NOT NULL,"
+                + VALUE_COLUMN_NAME + " TEXT NOT NULL"
+                + ")");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + OBJECT_DB_TABLE_NAME + "("
                 + KEY_COLUMN_NAME + " TEXT PRIMARY KEY NOT NULL,"
                 + VALUE_COLUMN_NAME + " TEXT NOT NULL"
                 + ")");

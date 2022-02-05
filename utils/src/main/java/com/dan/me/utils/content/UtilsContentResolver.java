@@ -12,6 +12,7 @@ import android.net.Uri;
 import com.dan.me.utils.log.LogUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 class UtilsContentResolver {
 
@@ -24,6 +25,7 @@ class UtilsContentResolver {
     private static final Uri URI_DB_INTEGER = UtilsContentConstants.URI_DB_INTEGER;
     private static final Uri URI_DB_LONG = UtilsContentConstants.URI_DB_LONG;
     private static final Uri URI_DB_STRING = UtilsContentConstants.URI_DB_STRING;
+    private static final Uri URI_DB_OBJECT = UtilsContentConstants.URI_DB_OBJECT;
 
     private static final String KEY_COLUMN_NAME = UtilsContentConstants.KEY_COLUMN_NAME;
     private static final String VALUE_COLUMN_NAME = UtilsContentConstants.VALUE_COLUMN_NAME;
@@ -42,8 +44,9 @@ class UtilsContentResolver {
         sAppContext = appContent.getApplicationContext();
     }
 
+
     // boolean
-    static void putBoolean(String key, boolean value) {
+    static void putBoolean(@NonNull String key, boolean value) {
         LOGGER.i(TAG, "putBoolean() key: " + key + ", value: " + value);
         ContentValues values = new ContentValues();
         values.put(KEY_COLUMN_NAME, key);
@@ -51,7 +54,8 @@ class UtilsContentResolver {
         sAppContext.getContentResolver().insert(URI_DB_BOOLEAN, values);
     }
 
-    static Boolean getBoolean(String key) {
+    @Nullable
+    static Boolean getBoolean(@NonNull String key) {
         Boolean value = null;
         Cursor cursor = sAppContext.getContentResolver().query(URI_DB_BOOLEAN, new String[]{VALUE_COLUMN_NAME}, KEY_COLUMN_NAME + "=?", new String[]{key}, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -61,14 +65,14 @@ class UtilsContentResolver {
         return value;
     }
 
-    static void deleteBoolean(String key) {
+    static void deleteBoolean(@NonNull String key) {
         LOGGER.i(TAG, "deleteBoolean() key: " + key);
         sAppContext.getContentResolver().delete(URI_DB_BOOLEAN, KEY_COLUMN_NAME + "=?", new String[]{key});
     }
 
 
     // int
-    static void putInt(String key, int value) {
+    static void putInt(@NonNull String key, int value) {
         LOGGER.i(TAG, "putInt() key: " + key + ", value: " + value);
         ContentValues values = new ContentValues();
         values.put(KEY_COLUMN_NAME, key);
@@ -76,7 +80,8 @@ class UtilsContentResolver {
         sAppContext.getContentResolver().insert(URI_DB_INTEGER, values);
     }
 
-    static Integer getInt(String key) {
+    @Nullable
+    static Integer getInt(@NonNull String key) {
         Integer value = null;
         Cursor cursor = sAppContext.getContentResolver().query(URI_DB_INTEGER, new String[]{VALUE_COLUMN_NAME}, KEY_COLUMN_NAME + "=?", new String[]{key}, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -86,14 +91,14 @@ class UtilsContentResolver {
         return value;
     }
 
-    static void deleteInt(String key) {
+    static void deleteInt(@NonNull String key) {
         LOGGER.i(TAG, "deleteInt() key: " + key);
         sAppContext.getContentResolver().delete(URI_DB_INTEGER, KEY_COLUMN_NAME + "=?", new String[]{key});
     }
 
 
     // long
-    static void putLong(String key, long value) {
+    static void putLong(@NonNull String key, long value) {
         LOGGER.i(TAG, "putLong() key: " + key + ", value: " + value);
         ContentValues values = new ContentValues();
         values.put(KEY_COLUMN_NAME, key);
@@ -101,7 +106,8 @@ class UtilsContentResolver {
         sAppContext.getContentResolver().insert(URI_DB_LONG, values);
     }
 
-    static Long getLong(String key) {
+    @Nullable
+    static Long getLong(@NonNull String key) {
         Long value = null;
         Cursor cursor = sAppContext.getContentResolver().query(URI_DB_LONG, new String[]{VALUE_COLUMN_NAME}, KEY_COLUMN_NAME + "=?", new String[]{key}, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -111,27 +117,23 @@ class UtilsContentResolver {
         return value;
     }
 
-    static void deleteLong(String key) {
+    static void deleteLong(@NonNull String key) {
         LOGGER.i(TAG, "deleteLong() key: " + key);
         sAppContext.getContentResolver().delete(URI_DB_LONG, KEY_COLUMN_NAME + "=?", new String[]{key});
     }
 
 
     // String
-    static void putString(String key, String value) {
+    static void putString(@NonNull String key, @NonNull String value) {
         LOGGER.i(TAG, "putString() key: " + key + ", value: " + value);
-        if (value == null) {
-            // 如果value为null，就认为是要删除这个key
-            deleteString(key);
-        } else {
-            ContentValues values = new ContentValues();
-            values.put(KEY_COLUMN_NAME, key);
-            values.put(VALUE_COLUMN_NAME, value);
-            sAppContext.getContentResolver().insert(URI_DB_STRING, values);
-        }
+        ContentValues values = new ContentValues();
+        values.put(KEY_COLUMN_NAME, key);
+        values.put(VALUE_COLUMN_NAME, value);
+        sAppContext.getContentResolver().insert(URI_DB_STRING, values);
     }
 
-    static String getString(String key) {
+    @Nullable
+    static String getString(@NonNull String key) {
         String value = null;
         Cursor cursor = sAppContext.getContentResolver().query(URI_DB_STRING, new String[]{VALUE_COLUMN_NAME}, KEY_COLUMN_NAME + "=?", new String[]{key}, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -141,9 +143,38 @@ class UtilsContentResolver {
         return value;
     }
 
-    static void deleteString(String key) {
+    static void deleteString(@NonNull String key) {
         LOGGER.i(TAG, "deleteString() key: " + key);
         sAppContext.getContentResolver().delete(URI_DB_STRING, KEY_COLUMN_NAME + "=?", new String[]{key});
     }
 
+
+    // Object
+    static void putObject(@NonNull String key, @NonNull Object value) {
+        LOGGER.i(TAG, "putObject() key: " + key + ", value: " + value);
+        ContentValues values = new ContentValues();
+        values.put(KEY_COLUMN_NAME, key);
+        String objectString = UtilsContentSerializable.writeObject(value);
+        if (objectString == null) {
+            throw new NullPointerException("putObject() objectString is null");
+        }
+        values.put(VALUE_COLUMN_NAME, objectString);
+        sAppContext.getContentResolver().insert(URI_DB_OBJECT, values);
+    }
+
+    @Nullable
+    static Object getObject(@NonNull String key) {
+        String value = null;
+        Cursor cursor = sAppContext.getContentResolver().query(URI_DB_OBJECT, new String[]{VALUE_COLUMN_NAME}, KEY_COLUMN_NAME + "=?", new String[]{key}, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            value = cursor.getString(FIRST_COLUMN_INDEX/*只选了一列，故直接使用*/);
+            cursor.close();
+        }
+        return value == null ? null : UtilsContentSerializable.readObject(value);
+    }
+
+    static void deleteObject(@NonNull String key) {
+        LOGGER.i(TAG, "deleteObject() key: " + key);
+        sAppContext.getContentResolver().delete(URI_DB_OBJECT, KEY_COLUMN_NAME + "=?", new String[]{key});
+    }
 }

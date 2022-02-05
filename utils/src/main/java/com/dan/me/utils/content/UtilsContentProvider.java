@@ -34,15 +34,17 @@ public class UtilsContentProvider extends ContentProvider {
 
     private static final String AUTHORITY = UtilsContentConstants.AUTHORITY;
 
-    private static final String BOOLEAN_TABLE_NAME = UtilsContentConstants.BOOLEAN_DB_TABLE_NAME;
-    private static final String INTEGER_TABLE_NAME = UtilsContentConstants.INTEGER_DB_TABLE_NAME;
-    private static final String LONG_TABLE_NAME = UtilsContentConstants.LONG_DB_TABLE_NAME;
-    private static final String STRING_TABLE_NAME = UtilsContentConstants.STRING_DB_TABLE_NAME;
+    private static final String BOOLEAN_DB_TABLE_NAME = UtilsContentConstants.BOOLEAN_DB_TABLE_NAME;
+    private static final String INTEGER_DB_TABLE_NAME = UtilsContentConstants.INTEGER_DB_TABLE_NAME;
+    private static final String LONG_DB_TABLE_NAME = UtilsContentConstants.LONG_DB_TABLE_NAME;
+    private static final String STRING_DB_TABLE_NAME = UtilsContentConstants.STRING_DB_TABLE_NAME;
+    private static final String OBJECT_DB_TABLE_NAME = UtilsContentConstants.OBJECT_DB_TABLE_NAME;
 
     private static final int BOOLEAN_CODE = UtilsContentConstants.BOOLEAN_CODE;
     private static final int INTEGER_CODE = UtilsContentConstants.INTEGER_CODE;
     private static final int LONG_CODE = UtilsContentConstants.LONG_CODE;
     private static final int STRING_CODE = UtilsContentConstants.STRING_CODE;
+    private static final int OBJECT_CODE = UtilsContentConstants.OBJECT_CODE;
 
     private static final String KEY_COLUMN_NAME = UtilsContentConstants.KEY_COLUMN_NAME;
     private static final String VALUE_COLUMN_NAME = UtilsContentConstants.VALUE_COLUMN_NAME;
@@ -63,10 +65,11 @@ public class UtilsContentProvider extends ContentProvider {
 
     static {
         sUriTableMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        sUriTableMatcher.addURI(AUTHORITY, BOOLEAN_TABLE_NAME, BOOLEAN_CODE);
-        sUriTableMatcher.addURI(AUTHORITY, INTEGER_TABLE_NAME, INTEGER_CODE);
-        sUriTableMatcher.addURI(AUTHORITY, LONG_TABLE_NAME, LONG_CODE);
-        sUriTableMatcher.addURI(AUTHORITY, STRING_TABLE_NAME, STRING_CODE);
+        sUriTableMatcher.addURI(AUTHORITY, BOOLEAN_DB_TABLE_NAME, BOOLEAN_CODE);
+        sUriTableMatcher.addURI(AUTHORITY, INTEGER_DB_TABLE_NAME, INTEGER_CODE);
+        sUriTableMatcher.addURI(AUTHORITY, LONG_DB_TABLE_NAME, LONG_CODE);
+        sUriTableMatcher.addURI(AUTHORITY, STRING_DB_TABLE_NAME, STRING_CODE);
+        sUriTableMatcher.addURI(AUTHORITY, OBJECT_DB_TABLE_NAME, OBJECT_CODE);
     }
 
     @Override

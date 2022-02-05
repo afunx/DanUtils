@@ -4,8 +4,6 @@
 
 package com.dan.me.utils.content;
 
-import android.util.Log;
-
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -26,17 +24,17 @@ public class UtilsContentSerializableTest {
         int nextCount = 10;
         long nextTime = Long.MIN_VALUE;
         double nextTotal = 1234.56;
-        TestUtilsContentParcelable next = new TestUtilsContentParcelable(nextId, nextName, nextPrice, nextCount, nextTime, nextTotal, null);
+        TestUtilsContentObject next = new TestUtilsContentObject(nextId, nextName, nextPrice, nextCount, nextTime, nextTotal, null);
         int id = 10087;
         String name = "hello";
         float price = 987.654f;
         int count = 100;
         long time = Long.MAX_VALUE;
         double total = 98765.4;
-        TestUtilsContentParcelable current = new TestUtilsContentParcelable(id, name, price, count, time, total, next);
+        TestUtilsContentObject current = new TestUtilsContentObject(id, name, price, count, time, total, next);
         String serializableString = UtilsContentSerializable.writeObject(current);
         assertNotNull(serializableString);
-        TestUtilsContentParcelable result = (TestUtilsContentParcelable) UtilsContentSerializable.readObject(serializableString);
+        TestUtilsContentObject result = (TestUtilsContentObject) UtilsContentSerializable.readObject(serializableString);
         assertNotNull(result);
         assertEquals(id, result.getId());
         assertEquals(name, result.getName());

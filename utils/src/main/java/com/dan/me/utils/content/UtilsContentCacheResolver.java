@@ -12,6 +12,7 @@ import android.net.Uri;
 import com.dan.me.utils.log.LogUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class UtilsContentCacheResolver {
 
@@ -24,6 +25,7 @@ public class UtilsContentCacheResolver {
     private static final Uri URI_CACHE_INTEGER = UtilsContentConstants.URI_CACHE_INTEGER;
     private static final Uri URI_CACHE_LONG = UtilsContentConstants.URI_CACHE_LONG;
     private static final Uri URI_CACHE_STRING = UtilsContentConstants.URI_CACHE_STRING;
+    private static final Uri URI_CACHE_OBJECT = UtilsContentConstants.URI_CACHE_OBJECT;
 
     private static final String KEY_COLUMN_CACHE_NAME = UtilsContentConstants.KEY_CACHE_COLUMN_NAME;
     private static final String VALUE_COLUMN_CACHE_NAME = UtilsContentConstants.VALUE_CACHE_COLUMN_NAME;
@@ -117,15 +119,10 @@ public class UtilsContentCacheResolver {
     // String
     static void putString(String key, String value) {
         LOGGER.i(TAG, "putString() key: " + key + ", value: " + value);
-        if (value == null) {
-            // 如果value为null，就认为是要删除这个key
-            deleteString(key);
-        } else {
-            ContentValues values = new ContentValues();
-            values.put(KEY_COLUMN_CACHE_NAME, key);
-            values.put(VALUE_COLUMN_CACHE_NAME, value);
-            sAppContext.getContentResolver().insert(URI_CACHE_STRING, values);
-        }
+        ContentValues values = new ContentValues();
+        values.put(KEY_COLUMN_CACHE_NAME, key);
+        values.put(VALUE_COLUMN_CACHE_NAME, value);
+        sAppContext.getContentResolver().insert(URI_CACHE_STRING, values);
     }
 
     static String getString(String key) {
@@ -141,5 +138,33 @@ public class UtilsContentCacheResolver {
     static void deleteString(String key) {
         LOGGER.i(TAG, "deleteString() key: " + key);
         sAppContext.getContentResolver().delete(URI_CACHE_STRING, KEY_COLUMN_CACHE_NAME + "=?", new String[]{key});
+    }
+
+    // Object
+    static void putObject(@NonNull String key, @NonNull Object value) {
+        LOGGER.i(TAG, "putObject() key: " + key + ", value: " + value);
+        ContentValues values = new ContentValues();
+        values.put(KEY_COLUMN_CACHE_NAME, key);
+        String objectString = UtilsContentSerializable.writeObject(value);
+        if (objectString == null) {
+            throw new NullPointerException("putObject() objectString is null");
+        }
+        values.put(VALUE_COLUMN_CACHE_NAME, objectString);
+    }
+
+    @Nullable
+    static Object getObject(@NonNull String key) {
+        String value = null;
+        Cursor cursor = sAppContext.getContentResolver().query(URI_CACHE_OBJECT, new String[]{VALUE_COLUMN_CACHE_NAME}, KEY_COLUMN_CACHE_NAME + "=?", new String[]{key}, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            value = cursor.getString(FIRST_COLUMN_INDEX/*只选了一列，故直接使用*/);
+            cursor.close();
+        }
+        return value == null ? null : UtilsContentSerializable.readObject(value);
+    }
+
+    static void deleteObject(@NonNull String key) {
+        LOGGER.i(TAG, "deleteObject() key: " + key);
+        sAppContext.getContentResolver().delete(URI_CACHE_OBJECT, KEY_COLUMN_CACHE_NAME + "=?", new String[]{key});
     }
 }

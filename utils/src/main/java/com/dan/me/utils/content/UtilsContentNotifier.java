@@ -28,11 +28,13 @@ class UtilsContentNotifier extends ContentObserver {
     private static final Uri URI_DB_INTEGER = UtilsContentConstants.URI_DB_INTEGER;
     private static final Uri URI_DB_LONG = UtilsContentConstants.URI_DB_LONG;
     private static final Uri URI_DB_STRING = UtilsContentConstants.URI_DB_STRING;
+    private static final Uri URI_DB_OBJECT = UtilsContentConstants.URI_DB_OBJECT;
 
-    private static final String BOOLEAN_TABLE_NAME = UtilsContentConstants.BOOLEAN_DB_TABLE_NAME;
-    private static final String INTEGER_TABLE_NAME = UtilsContentConstants.INTEGER_DB_TABLE_NAME;
-    private static final String LONG_TABLE_NAME = UtilsContentConstants.LONG_DB_TABLE_NAME;
-    private static final String STRING_TABLE_NAME = UtilsContentConstants.STRING_DB_TABLE_NAME;
+    private static final String BOOLEAN_DB_TABLE_NAME = UtilsContentConstants.BOOLEAN_DB_TABLE_NAME;
+    private static final String INTEGER_DB_TABLE_NAME = UtilsContentConstants.INTEGER_DB_TABLE_NAME;
+    private static final String LONG_DB_TABLE_NAME = UtilsContentConstants.LONG_DB_TABLE_NAME;
+    private static final String STRING_DB_TABLE_NAME = UtilsContentConstants.STRING_DB_TABLE_NAME;
+    private static final String OBJECT_DB_TABLE_NAME = UtilsContentConstants.OBJECT_DB_TABLE_NAME;
 
     private static final String ACTION_DB_INSERT = UtilsContentConstants.ACTION_DB_INSERT;
     private static final String ACTION_DB_UPDATE = UtilsContentConstants.ACTION_DB_UPDATE;
@@ -44,11 +46,13 @@ class UtilsContentNotifier extends ContentObserver {
     private final Map<String, Integer> mIntegerMap = new HashMap<>();
     private final Map<String, Long> mLongMap = new HashMap<>();
     private final Map<String, String> mStringMap = new HashMap<>();
+    private final Map<String, Object> mObjectMap = new HashMap<>();
 
     private final Map<String, List<UtilsContentCallback<Boolean>>> mBooleanCallbacksMap = new HashMap<>();
     private final Map<String, List<UtilsContentCallback<Integer>>> mIntegerCallbacksMap = new HashMap<>();
     private final Map<String, List<UtilsContentCallback<Long>>> mLongCallbacksMap = new HashMap<>();
     private final Map<String, List<UtilsContentCallback<String>>> mStringCallbacksMap = new HashMap<>();
+    private final Map<String, List<UtilsContentCallback<Object>>> mObjectCallbacksMap = new HashMap<>();
 
     private static final HandlerThread sHandlerThread;
 
@@ -108,6 +112,7 @@ class UtilsContentNotifier extends ContentObserver {
         context.getContentResolver().registerContentObserver(URI_DB_LONG, true, this);
         context.getContentResolver().registerContentObserver(URI_DB_STRING, true, this);
         context.getContentResolver().registerContentObserver(URI_DB_BOOLEAN, true, this);
+        context.getContentResolver().registerContentObserver(URI_DB_OBJECT, true, this);
     }
 
     void unregisterContentObserver(@NonNull Context context) {
@@ -146,6 +151,14 @@ class UtilsContentNotifier extends ContentObserver {
         unregisterCallback(key, callback, mStringCallbacksMap);
     }
 
+    synchronized void registerObjectCallback(@NonNull String key, @NonNull UtilsContentCallback<Object> callback) {
+        registerCallback(key, callback, Object.class, mObjectMap, mObjectCallbacksMap);
+    }
+
+    synchronized void unregisterObjectCallback(@NonNull String key, @NonNull UtilsContentCallback<Object> callback) {
+        unregisterCallback(key, callback, mObjectCallbacksMap);
+    }
+
     @SuppressWarnings("unchecked")
     private <T> void registerCallback(@NonNull String key, @NonNull UtilsContentCallback<T> callback,
                                       @NonNull Class<T> clazz, @NonNull Map<String, T> typeMap,
@@ -173,7 +186,7 @@ class UtilsContentNotifier extends ContentObserver {
         } else if (clazz.getName().equals(String.class.getName())) {
             newValue = (T) UtilsContentResolver.getString(key);
         } else {
-            throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
+            newValue = (T) UtilsContentResolver.getObject(key);
         }
         // 若newValue为空，则忽略之
         if (newValue != null) {
@@ -194,7 +207,7 @@ class UtilsContentNotifier extends ContentObserver {
 
     private void doCallbackOnChanged(@NonNull String table, @NonNull String key, @NonNull String value) {
         switch (table) {
-            case BOOLEAN_TABLE_NAME: {
+            case BOOLEAN_DB_TABLE_NAME: {
                 Boolean oldValue = mBooleanMap.get(key);
                 boolean newValue = Integer.parseInt(value) == BOOLEAN_TRUE;
                 if (oldValue == null || oldValue != newValue) {
@@ -208,7 +221,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case INTEGER_TABLE_NAME: {
+            case INTEGER_DB_TABLE_NAME: {
                 Integer oldValue = mIntegerMap.get(key);
                 int newValue = Integer.parseInt(value);
                 if (oldValue == null || oldValue != newValue) {
@@ -222,7 +235,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case LONG_TABLE_NAME: {
+            case LONG_DB_TABLE_NAME: {
                 Long oldValue = mLongMap.get(key);
                 long newValue = Long.parseLong(value);
                 if (oldValue == null || oldValue != newValue) {
@@ -236,7 +249,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case STRING_TABLE_NAME: {
+            case STRING_DB_TABLE_NAME: {
                 String oldValue = mStringMap.get(key);
                 @SuppressWarnings("UnnecessaryLocalVariable")/* 代码看上去和其他类似 */
                 String newValue = value;
@@ -251,6 +264,23 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
+            case OBJECT_DB_TABLE_NAME: {
+                Object oldValue = mObjectMap.get(key);
+                Object newValue = UtilsContentSerializable.readObject(value);
+                if (newValue == null) {
+                    throw new NullPointerException("doCallbackOnChanged() OBJECT_DB_TABLE_NAME newValue is null");
+                }
+                if (oldValue == null || !oldValue.equals(newValue)) {
+                    List<UtilsContentCallback<Object>> utilsContentCallbacks = mObjectCallbacksMap.get(key);
+                    if (utilsContentCallbacks != null) {
+                        for (UtilsContentCallback<Object> utilsContentCallback : utilsContentCallbacks) {
+                            doRealCallbackOnChanged(utilsContentCallback, oldValue, newValue);
+                        }
+                    }
+                    mObjectMap.put(key, newValue);
+                }
+            }
+            break;
             default:
                 throw new IllegalArgumentException("table: " + table + " is invalid");
         }
@@ -258,7 +288,7 @@ class UtilsContentNotifier extends ContentObserver {
 
     private void doCallbackOnDeleted(@NonNull String table, @NonNull String key) {
         switch (table) {
-            case BOOLEAN_TABLE_NAME: {
+            case BOOLEAN_DB_TABLE_NAME: {
                 mBooleanMap.remove(key);
                 List<UtilsContentCallback<Boolean>> utilsContentCallbacks = mBooleanCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {
@@ -268,7 +298,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case INTEGER_TABLE_NAME: {
+            case INTEGER_DB_TABLE_NAME: {
                 mIntegerMap.remove(key);
                 List<UtilsContentCallback<Integer>> utilsContentCallbacks = mIntegerCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {
@@ -278,7 +308,7 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case LONG_TABLE_NAME: {
+            case LONG_DB_TABLE_NAME: {
                 mLongMap.remove(key);
                 List<UtilsContentCallback<Long>> utilsContentCallbacks = mLongCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {
@@ -288,11 +318,20 @@ class UtilsContentNotifier extends ContentObserver {
                 }
             }
             break;
-            case STRING_TABLE_NAME: {
+            case STRING_DB_TABLE_NAME: {
                 mStringMap.remove(key);
                 List<UtilsContentCallback<String>> utilsContentCallbacks = mStringCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {
                     for (UtilsContentCallback<String> utilsContentCallback : utilsContentCallbacks) {
+                        doRealCallbackOnDeleted(utilsContentCallback);
+                    }
+                }
+            }
+            case OBJECT_DB_TABLE_NAME: {
+                mObjectMap.remove(key);
+                List<UtilsContentCallback<Object>> utilsContentCallbacks = mObjectCallbacksMap.get(key);
+                if (utilsContentCallbacks != null) {
+                    for (UtilsContentCallback<Object> utilsContentCallback : utilsContentCallbacks) {
                         doRealCallbackOnDeleted(utilsContentCallback);
                     }
                 }

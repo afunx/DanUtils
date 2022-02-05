@@ -28,11 +28,13 @@ class UtilsContentCacheNotifier extends ContentObserver {
     private static final Uri URI_CACHE_INTEGER = UtilsContentConstants.URI_CACHE_INTEGER;
     private static final Uri URI_CACHE_LONG = UtilsContentConstants.URI_CACHE_LONG;
     private static final Uri URI_CACHE_STRING = UtilsContentConstants.URI_CACHE_STRING;
+    private static final Uri URI_CACHE_OBJECT = UtilsContentConstants.URI_CACHE_OBJECT;
 
     private static final String BOOLEAN_CACHE_TABLE_NAME = UtilsContentConstants.BOOLEAN_CACHE_TABLE_NAME;
     private static final String INTEGER_CACHE_TABLE_NAME = UtilsContentConstants.INTEGER_CACHE_TABLE_NAME;
     private static final String LONG_CACHE_TABLE_NAME = UtilsContentConstants.LONG_CACHE_TABLE_NAME;
     private static final String STRING_CACHE_TABLE_NAME = UtilsContentConstants.STRING_CACHE_TABLE_NAME;
+    private static final String OBJECT_CACHE_TABLE_NAME = UtilsContentConstants.OBJECT_CACHE_TABLE_NAME;
 
     private static final String ACTION_CACHE_INSERT = UtilsContentConstants.ACTION_CACHE_INSERT;
     private static final String ACTION_CACHE_UPDATE = UtilsContentConstants.ACTION_CACHE_UPDATE;
@@ -44,11 +46,13 @@ class UtilsContentCacheNotifier extends ContentObserver {
     private final Map<String, Integer> mIntegerMap = new HashMap<>();
     private final Map<String, Long> mLongMap = new HashMap<>();
     private final Map<String, String> mStringMap = new HashMap<>();
+    private final Map<String, Object> mObjectMap = new HashMap<>();
 
     private final Map<String, List<UtilsContentCallback<Boolean>>> mBooleanCallbacksMap = new HashMap<>();
     private final Map<String, List<UtilsContentCallback<Integer>>> mIntegerCallbacksMap = new HashMap<>();
     private final Map<String, List<UtilsContentCallback<Long>>> mLongCallbacksMap = new HashMap<>();
     private final Map<String, List<UtilsContentCallback<String>>> mStringCallbacksMap = new HashMap<>();
+    private final Map<String, List<UtilsContentCallback<Object>>> mObjectCallbacksMap = new HashMap<>();
 
     private static final HandlerThread sHandlerThread;
 
@@ -108,6 +112,7 @@ class UtilsContentCacheNotifier extends ContentObserver {
         context.getContentResolver().registerContentObserver(URI_CACHE_LONG, true, this);
         context.getContentResolver().registerContentObserver(URI_CACHE_STRING, true, this);
         context.getContentResolver().registerContentObserver(URI_CACHE_BOOLEAN, true, this);
+        context.getContentResolver().registerContentObserver(URI_CACHE_OBJECT, true, this);
     }
 
     void unregisterContentObserver(@NonNull Context context) {
@@ -173,7 +178,7 @@ class UtilsContentCacheNotifier extends ContentObserver {
         } else if (clazz.getName().equals(String.class.getName())) {
             newValue = (T) UtilsContentCacheResolver.getString(key);
         } else {
-            throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
+            newValue = (T) UtilsContentCacheResolver.getObject(key);
         }
         // 若newValue为空，则忽略之
         if (newValue != null) {
@@ -251,6 +256,22 @@ class UtilsContentCacheNotifier extends ContentObserver {
                 }
             }
             break;
+            case OBJECT_CACHE_TABLE_NAME: {
+                Object oldValue = mObjectMap.get(key);
+                Object newValue = UtilsContentSerializable.readObject(value);
+                if (newValue == null) {
+                    throw new NullPointerException("doCallbackOnChanged() OBJECT_CACHE_TABLE_NAME newValue is null");
+                }
+                if (oldValue == null || !oldValue.equals(newValue)) {
+                    List<UtilsContentCallback<Object>> utilsContentCallbacks = mObjectCallbacksMap.get(key);
+                    if (utilsContentCallbacks != null) {
+                        for (UtilsContentCallback<Object> utilsContentCallback : utilsContentCallbacks) {
+                            doRealCallbackOnChanged(utilsContentCallback, oldValue, newValue);
+                        }
+                    }
+                }
+            }
+            break;
             default:
                 throw new IllegalArgumentException("table: " + table + " is invalid");
         }
@@ -293,6 +314,16 @@ class UtilsContentCacheNotifier extends ContentObserver {
                 List<UtilsContentCallback<String>> utilsContentCallbacks = mStringCallbacksMap.get(key);
                 if (utilsContentCallbacks != null) {
                     for (UtilsContentCallback<String> utilsContentCallback : utilsContentCallbacks) {
+                        doRealCallbackOnDeleted(utilsContentCallback);
+                    }
+                }
+            }
+            break;
+            case OBJECT_CACHE_TABLE_NAME: {
+                mObjectMap.remove(key);
+                List<UtilsContentCallback<Object>> utilsContentCallbacks = mObjectCallbacksMap.get(key);
+                if (utilsContentCallbacks != null) {
+                    for (UtilsContentCallback<Object> utilsContentCallback : utilsContentCallbacks) {
                         doRealCallbackOnDeleted(utilsContentCallback);
                     }
                 }

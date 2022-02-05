@@ -310,6 +310,76 @@ public class UtilsContentHelperTest {
         }
     }
 
+    private Map<String, Object> getObjectValuesMap() {
+        Map<String, Object> valuesMap = new HashMap<>();
+        int id = 10086;
+        String name = "##d/a//n\\\\";
+        float price = 12345.6789f;
+        int count = 10;
+        long time = Long.MAX_VALUE;
+        double total = 123456.789;
+        TestUtilsContentObject next = null;
+        TestUtilsContentObject testUtilsContentObject = new TestUtilsContentObject(id, name, price, count, time, total, next);
+        valuesMap.put("key##", testUtilsContentObject);
+        return valuesMap;
+    }
+
+    private Map<String, Object> getObjectOthersMap() {
+        Map<String, Object> othersMap = new HashMap<>();
+        int id = 10086;
+        String name = "##d/a//n\\\\";
+        float price = 1234.6789f;
+        int count = 10;
+        long time = Long.MIN_VALUE;
+        double total = 12346.789;
+        TestUtilsContentObject next = null;
+        TestUtilsContentObject testUtilsContentObject = new TestUtilsContentObject(id, name, price, count, time, total, next);
+        othersMap.put("key##", testUtilsContentObject);
+        return othersMap;
+    }
+
+    @Test
+    public void putObject() {
+        Map<String, Object> valuesMap = getObjectValuesMap();
+        Map<String, Object> othersMap = getObjectOthersMap();
+        for (String key : valuesMap.keySet()) {
+            Object value = valuesMap.get(key);
+            Object other = othersMap.get(key);
+            testPut(Object.class, key, value, other);
+        }
+    }
+
+    @Test
+    public void getObject() {
+        Map<String, Object> valuesMap = getObjectValuesMap();
+        for (String key : valuesMap.keySet()) {
+            Object value = valuesMap.get(key);
+            testGet(Object.class, key, value);
+        }
+    }
+
+    @Test
+    public void deleteObject() {
+        Map<String, Object> valuesMap = getObjectValuesMap();
+        for (String key : valuesMap.keySet()) {
+            Object value = valuesMap.get(key);
+            testDelete(Object.class, key, value);
+        }
+    }
+
+    @Test
+    public void registerObjectCallback() {
+        // 已在其它地方测试过
+    }
+
+    @Test
+    public void unregisterObjectCallback() {
+        Map<String, Object> valuesMap = getObjectValuesMap();
+        for (String key : valuesMap.keySet()) {
+            Object value = valuesMap.get(key);
+            testUnregister(Object.class, key, value);
+        }
+    }
 
     private <T> void putValue(@NonNull Class<T> clazz, @NonNull String key, @NonNull T value) {
         if (clazz.getName().equals(Boolean.class.getName())) {
@@ -321,7 +391,7 @@ public class UtilsContentHelperTest {
         } else if (clazz.getName().equals(String.class.getName())) {
             UtilsContentHelper.putString(key, (String) value);
         } else {
-            throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
+            UtilsContentHelper.putObject(key, value);
         }
     }
 
@@ -335,7 +405,7 @@ public class UtilsContentHelperTest {
         } else if (clazz.getName().equals(String.class.getName())) {
             return (T) UtilsContentHelper.getString(key);
         } else {
-            throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
+            return (T) UtilsContentHelper.getObject(key);
         }
     }
 
@@ -349,7 +419,7 @@ public class UtilsContentHelperTest {
         } else if (clazz.getName().equals(String.class.getName())) {
             UtilsContentHelper.deleteString(key);
         } else {
-            throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
+            UtilsContentHelper.deleteObject(key);
         }
     }
 
@@ -363,7 +433,7 @@ public class UtilsContentHelperTest {
         } else if (clazz.getName().equals(String.class.getName())) {
             UtilsContentHelper.registerStringCallback(key, (UtilsContentCallback<String>) callback);
         } else {
-            throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
+            UtilsContentHelper.registerObjectCallback(key, (UtilsContentCallback<Object>) callback);
         }
     }
 
@@ -377,7 +447,7 @@ public class UtilsContentHelperTest {
         } else if (clazz.getName().equals(String.class.getName())) {
             UtilsContentHelper.unregisterStringCallback(key, (UtilsContentCallback<String>) callback);
         } else {
-            throw new IllegalArgumentException("clazz: " + clazz + " is invalid");
+            UtilsContentHelper.unregisterObjectCallback(key, (UtilsContentCallback<Object>) callback);
         }
     }
 
@@ -424,6 +494,9 @@ public class UtilsContentHelperTest {
         // 放置数据
         putValue(clazz, key, value);
         sleep(50);
+        if (clazz == Object.class) {
+            sleep(1000);
+        }
         // 注册回调
         T[] oldValues = (T[]) Array.newInstance(clazz, 1);
         T[] newValues = (T[]) Array.newInstance(clazz, 1);
