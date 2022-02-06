@@ -7,6 +7,8 @@ package com.dan.me.utils.log;
 import android.content.Context;
 import android.util.Log;
 
+import com.dan.me.utils.BuildConfig;
+
 import androidx.annotation.NonNull;
 
 public class LogUtils {
@@ -69,6 +71,13 @@ public class LogUtils {
         sCrashLogger.setPackageName(appContext.getPackageName());
         sCrashLogger.setFolder(logUtilsOptions.getBasePath());
         Thread.setDefaultUncaughtExceptionHandler(new CrashLogger.CrashHandler(sCrashLogger));
+    }
+
+    /**
+     * 日志记录一下版本信息
+     */
+    public static void logVersion() {
+        sLogGeneralHandler.log(LEVEL_I, TAG, BuildConfig.VERSION_NAME);
     }
 
     /**

@@ -61,6 +61,8 @@ public class LogUtilsTest {
 
     @AfterClass
     public static void stop() {
+        // 临时调试一下LogVersions
+        // LogUtils.logVersion();
         // 测试结束后，再删除全部文件
         FileUtils.dirDelete(sBasePath, true);
         LogUtils.clearLogUtilsOptions();

@@ -3,16 +3,25 @@ plugins {
 }
 
 android {
-    compileSdk 30
+
+    def sdk = rootProject.ext.sdk
+
+    compileSdk sdk.compileSdkVersion
 
     defaultConfig {
+
         applicationId "com.dan.me.utils"
-        minSdk 21
-        targetSdk 30
-        versionCode 1
-        versionName "1.0"
+
+        minSdk sdk.minSdkVersion
+        targetSdk sdk.targetSdkVersion
+
+        def versions = rootProject.ext.versions
+
+        versionCode versions.appVersionCode
+        versionName versions.appVersionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
