@@ -37,6 +37,8 @@ class GeneralLogger extends BaseLogger {
 
     @Override
     protected void setFolder(@NonNull String basePath) {
+        // 别忘记清除mLogPath
+        mLogPath = null;
         mFolder = basePath.endsWith(File.separator) ? basePath + GENERAL_SUB_PATH : basePath + File.separator + GENERAL_SUB_PATH;
         if (DEBUG) {
             Log.i(TAG, "setFolder() basePath: " + basePath + ", folder: " + mFolder);
