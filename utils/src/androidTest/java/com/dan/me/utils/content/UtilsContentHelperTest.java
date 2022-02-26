@@ -15,6 +15,7 @@ import com.dan.me.utils.log.LogUtilsOptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;
@@ -23,9 +24,11 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static org.junit.Assert.*;
 
+@RunWith(AndroidJUnit4.class)
 @SuppressWarnings({"unchecked", "ConstantConditions", "SameParameterValue"})
 public class UtilsContentHelperTest {
 

@@ -5,11 +5,15 @@
 package com.dan.me.utils.content;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import static org.junit.Assert.*;
 
+@RunWith(AndroidJUnit4.class)
 @SuppressWarnings("SameParameterValue")
 public class UtilsContentEscapeTest {
 
