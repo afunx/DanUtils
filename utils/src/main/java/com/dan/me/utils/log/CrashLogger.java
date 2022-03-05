@@ -8,6 +8,7 @@ import android.os.Process;
 import android.util.Log;
 
 import com.dan.me.utils.io.FileUtils;
+import com.dan.me.utils.string.ThrowableUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -72,12 +73,8 @@ class CrashLogger {
         if (DEBUG) {
             Log.e(TAG, "logCrash()");
         }
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final PrintStream ps = new PrintStream(bos);
-        e.printStackTrace(ps);
-        ps.close();
         final long time = System.currentTimeMillis();
-        final String msg = bos.toString();
+        final String msg = ThrowableUtils.parseStackTrace(e);
         final int pid = android.os.Process.myPid();
         final int tid = android.os.Process.myTid();
         final Date date = new Date(time);
