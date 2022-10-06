@@ -18,8 +18,8 @@ task clean(type: Delete) {
 
 ext {
     versions =[
-            appVersionCode : 1,
-            appVersionName : '1.0.0',
+            appVersionCode : 2,
+            appVersionName : '1.0.1',
     ]
 
     sdk = [
