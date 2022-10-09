@@ -1,5 +1,12 @@
 # 更新记录
 <br/>
+2022/10/09
+<br/>
+v1.0.2<br/>
+1. provider UtilsContentProvider不再打包进aar中。<br/>
+<br/>
+
+<br/>
 2022/10/06
 <br/>
 v1.0.1<br/>
