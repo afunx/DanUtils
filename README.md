@@ -1,5 +1,12 @@
 # 更新记录
 <br/>
+2022/10/19
+<br/>
+v1.0.3<br/>
+1. 设置BaseLogger.java中的DEBUG为false。FileUtils.java中的fileAppend()忽略IOException。<br/>
+<br/>
+
+<br/>
 2022/10/09
 <br/>
 v1.0.2<br/>
