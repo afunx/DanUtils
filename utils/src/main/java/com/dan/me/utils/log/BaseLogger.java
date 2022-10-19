@@ -33,7 +33,7 @@ import static com.dan.me.utils.log.LogUtils.LEVEL_W_STR;
 
 abstract class BaseLogger implements Handler.Callback {
 
-    protected static final boolean DEBUG = true;
+    protected static final boolean DEBUG = false;
 
     private static final String NEW_LINE = System.getProperty("line.separator");
     protected static final String LOG_FILE_EXTENSION = ".txt";

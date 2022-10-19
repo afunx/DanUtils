@@ -359,8 +359,7 @@ public class FileUtils {
             fileWriter.append(content);
             fileWriter.flush();
             return true;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignore) {
         } finally {
             if (fileWriter != null) {
                 try {
