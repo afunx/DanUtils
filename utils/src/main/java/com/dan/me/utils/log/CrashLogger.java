@@ -5,16 +5,16 @@
 package com.dan.me.utils.log;
 
 import android.os.Process;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.dan.me.utils.io.FileUtils;
 import com.dan.me.utils.string.ThrowableUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -38,6 +38,8 @@ class CrashLogger {
 
     private final SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 
+    private long mMaxTotalSize;
+
     private String mFolder;
 
     private String mPackageName = "";
@@ -51,6 +53,10 @@ class CrashLogger {
         if (DEBUG) {
             Log.i(TAG, "setFolder() basePath: " + basePath + ", folder: " + mFolder);
         }
+    }
+
+    void setMaxTotalSize(long maxTotalSize) {
+        mMaxTotalSize = maxTotalSize;
     }
 
     private String getLogPath(long time) {
@@ -67,6 +73,32 @@ class CrashLogger {
     private String compose(final int pid, final int tid, final String time, final String msg) {
         return String.format(Locale.getDefault(), "%s %d-%d/%s %s/%s: %s%s",
                 time, pid, tid, mPackageName, "E" /*levelStr*/, TAG, msg, NEW_LINE);
+    }
+
+    private void deleteOvertimeLogs() {
+        long start = SystemClock.elapsedRealtime();
+        String folderPath = mFolder;
+        long diskSpace = FileUtils.dirDiskSpace(folderPath);
+        long overDiskSpace = diskSpace - mMaxTotalSize;
+        int deleteFileCount = 0;
+        long freeDiskSpace = 0;
+        if (overDiskSpace > 0) {
+            List<File> fileList = FileUtils.dirEarliestModifyFiles(folderPath, overDiskSpace);
+            for (File file : fileList) {
+                long fileLength = file.length();
+                boolean suc = file.delete();
+                if (suc) {
+                    ++deleteFileCount;
+                    freeDiskSpace += fileLength;
+                } else {
+                    Log.e(TAG, "deleteOvertimeLogs() file: " + file.getAbsolutePath() + " fail");
+                }
+            }
+        }
+        long consume = SystemClock.elapsedRealtime() - start;
+        Log.e(TAG, "deleteOvertimeLogs() diskSpace: " + diskSpace + ", overDiskSpace: " + overDiskSpace
+                + ", delete: " + deleteFileCount + " files, free " + freeDiskSpace  + " bytes, consume "
+                + consume + " ms");
     }
 
     private void logCrash(@NonNull Throwable e) {
@@ -108,6 +140,8 @@ class CrashLogger {
             }
             // 写日志
             this.crashLogger.logCrash(e);
+            // 删除过期日志
+            this.crashLogger.deleteOvertimeLogs();
             // 如果系统提供了默认的CrashHandler，则使用之
             if (defaultCrashHandler != null) {
                 defaultCrashHandler.uncaughtException(t, e);

@@ -15,8 +15,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.PriorityQueue;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -392,5 +394,78 @@ public class FileUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static long _dirDiskSpace(@NonNull File dirFile) {
+        if (!dirFile.isDirectory()) {
+            return 0;
+        }
+        long diskSpace = 0;
+        File[] files = dirFile.listFiles();
+        if (files == null) {
+            return 0;
+        }
+        for (File file : files) {
+            if (file.isFile()) {
+                diskSpace += file.length();
+            } else if (file.isDirectory()) {
+                diskSpace += _dirDiskSpace(dirFile);
+            }
+        }
+        return diskSpace;
+    }
+
+    /**
+     * 获取手机文件夹及其子文件夹占用磁盘空间大小
+     *
+     * @param dirPath 文件夹路径
+     * @return 占用磁盘空间大小，单位：字节
+     */
+    public static long dirDiskSpace(@NonNull String dirPath) {
+        File dirFile = new File(dirPath);
+        return _dirDiskSpace(dirFile);
+    }
+
+    private static void _dirEarliestModifyFiles(@NonNull File dirFile, @NonNull PriorityQueue<File> filePriorityQueue) {
+        if (!dirFile.isDirectory()) {
+            return;
+        }
+        File[] files = dirFile.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file.isFile()) {
+                filePriorityQueue.offer(file);
+            } else if (file.isDirectory()) {
+                _dirEarliestModifyFiles(file, filePriorityQueue);
+            }
+        }
+    }
+
+    private static List<File> _dirEarliestModifyFiles(@NonNull File dirFile, long diskSpace) {
+        Comparator<File> comparator = (o1, o2) -> Long.compare(o1.lastModified(), o2.lastModified());
+        PriorityQueue<File> priorityQueue = new PriorityQueue<>(16, comparator);
+        _dirEarliestModifyFiles(dirFile, priorityQueue);
+        long curDiskSpace = 0;
+        List<File> fileList = new ArrayList<>();
+        while (curDiskSpace < diskSpace && !priorityQueue.isEmpty()) {
+            File file = priorityQueue.poll();
+            fileList.add(file);
+            curDiskSpace += file.length();
+        }
+        return fileList;
+    }
+
+    /**
+     * 获取手机文件夹及其子文件夹最早修改的文件列表
+     *
+     * @param dirPath   文件夹路径
+     * @param diskSpace 占用磁盘空间大小
+     * @return 最早修改的文件列表（首次大于等于diskSpace参数）
+     */
+    @NonNull
+    public static List<File> dirEarliestModifyFiles(@NonNull String dirPath, long diskSpace) {
+        return _dirEarliestModifyFiles(new File(dirPath), diskSpace);
     }
 }

@@ -65,9 +65,11 @@ public class LogUtils {
         sLogGeneralHandler.setPackageName(appContext.getPackageName());
         sLogGeneralHandler.setFolder(logUtilsOptions.getBasePath());
         sLogGeneralHandler.setMaxFileSize(logUtilsOptions.getGeneralFileMaxSize());
+        sLogGeneralHandler.setMaxTotalSize(logUtilsOptions.getGeneralTotalMaxSize());
         sSpecializedLogger.setPackageName(appContext.getPackageName());
         sSpecializedLogger.setFolder(logUtilsOptions.getBasePath());
         sSpecializedLogger.setMaxFileSize(logUtilsOptions.getSpecializedFileMaxSize());
+        sSpecializedLogger.setMaxTotalSize(logUtilsOptions.getSpecializedTotalMaxSize());
         sCrashLogger.setPackageName(appContext.getPackageName());
         sCrashLogger.setFolder(logUtilsOptions.getBasePath());
         Thread.setDefaultUncaughtExceptionHandler(new CrashLogger.CrashHandler(sCrashLogger));

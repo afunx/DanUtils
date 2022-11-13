@@ -63,6 +63,10 @@ class SpecializedLogger extends BaseLogger {
             }
         }
         if (logPath == null || new File(logPath).length() >= mMaxFileSize) {
+
+            // 仅在写新的日志文件时，才去删除过期日志文件
+            deleteOvertimeLogs();
+
             SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
             String logName = LOG_FILE_PREFIX + fmt.format(new Date(time)) + LOG_FILE_EXTENSION;
             logPath = mFolder + tag + File.separator + logName;
@@ -70,5 +74,11 @@ class SpecializedLogger extends BaseLogger {
         }
         // tag/log_20220123_205508.txt
         return logPath;
+    }
+
+    @NonNull
+    @Override
+    protected String getFolderPath() {
+        return mFolder;
     }
 }

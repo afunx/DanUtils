@@ -7,12 +7,15 @@ package com.dan.me.utils.log;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.dan.me.utils.io.FileUtils;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -50,6 +53,8 @@ abstract class BaseLogger implements Handler.Callback {
 
     protected long mMaxFileSize = 4 * 1024 * 1024;
 
+    protected long mMaxTotalSize = 24 * 1024 * 1024;
+
     private String mPackageName = "";
 
     BaseLogger() {
@@ -67,6 +72,10 @@ abstract class BaseLogger implements Handler.Callback {
         mMaxFileSize = maxFileSize;
     }
 
+    void setMaxTotalSize(long maxTotalSize) {
+        mMaxTotalSize = maxTotalSize;
+    }
+
     @NonNull
     protected abstract String getTag();
 
@@ -80,6 +89,9 @@ abstract class BaseLogger implements Handler.Callback {
 
     @Nullable
     protected abstract String getLogPath(long time, String tag);
+
+    @NonNull
+    protected abstract String getFolderPath();
 
     void log(int level, final String tag, final String msg) {
         // 多线程访问时，即使存在同步问题，也不会超过1ms的误差
@@ -152,5 +164,31 @@ abstract class BaseLogger implements Handler.Callback {
     private String compose(final String levelStr, final int pid, final int tid, final String time, final String tag, final String msg) {
         return String.format(Locale.getDefault(),"%s %d-%d/%s %s/%s: %s%s",
                 time, pid, tid, mPackageName, levelStr, tag, msg, NEW_LINE);
+    }
+
+    protected void deleteOvertimeLogs() {
+        long start = SystemClock.elapsedRealtime();
+        String folderPath = getFolderPath();
+        long diskSpace = FileUtils.dirDiskSpace(folderPath);
+        long overDiskSpace = diskSpace - mMaxTotalSize;
+        int deleteFileCount = 0;
+        long freeDiskSpace = 0;
+        if (overDiskSpace > 0) {
+            List<File> fileList = FileUtils.dirEarliestModifyFiles(folderPath, overDiskSpace);
+            for (File file : fileList) {
+                long fileLength = file.length();
+                boolean suc = file.delete();
+                if (suc) {
+                    ++deleteFileCount;
+                    freeDiskSpace += fileLength;
+                } else {
+                    Log.e(mTag, "deleteOvertimeLogs() file: " + file.getAbsolutePath() + " fail");
+                }
+            }
+        }
+        long consume = SystemClock.elapsedRealtime() - start;
+        Log.e(mTag, "deleteOvertimeLogs() diskSpace: " + diskSpace + ", overDiskSpace: " + overDiskSpace
+                + ", delete: " + deleteFileCount + " files, free " + freeDiskSpace  + " bytes, consume "
+                + consume + " ms");
     }
 }

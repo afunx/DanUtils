@@ -53,6 +53,10 @@ class GeneralLogger extends BaseLogger {
             }
         }
         if (mLogPath == null || new File(mLogPath).length() >= mMaxFileSize) {
+
+            // 仅在写新的日志文件时，才去删除过期日志文件
+            deleteOvertimeLogs();
+
             SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
             String logName = LOG_FILE_PREFIX + fmt.format(new Date(time)) + LOG_FILE_EXTENSION;
             mLogPath = mFolder + logName;
@@ -65,5 +69,11 @@ class GeneralLogger extends BaseLogger {
     @Override
     protected String getLogPath(long time, String tag) {
         return null;
+    }
+
+    @NonNull
+    @Override
+    protected String getFolderPath() {
+        return mFolder;
     }
 }
