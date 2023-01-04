@@ -444,8 +444,7 @@ public class FileUtils {
     }
 
     private static List<File> _dirEarliestModifyFiles(@NonNull File dirFile, long diskSpace) {
-        Comparator<File> comparator = (o1, o2) -> Long.compare(o1.lastModified(), o2.lastModified());
-        PriorityQueue<File> priorityQueue = new PriorityQueue<>(16, comparator);
+        PriorityQueue<File> priorityQueue = new PriorityQueue<>(16, File::compareTo);
         _dirEarliestModifyFiles(dirFile, priorityQueue);
         long curDiskSpace = 0;
         List<File> fileList = new ArrayList<>();
